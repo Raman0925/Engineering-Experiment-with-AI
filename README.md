@@ -2,4 +2,4 @@
 
 An app for Experiment 
 
-checkout the site: https://engineering-experiment-with-ai.streamlit.app/
+Checkout the site: https://engineering-experiment-with-ai.streamlit.app/
