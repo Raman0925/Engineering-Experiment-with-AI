@@ -1,11 +1,13 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
+
 
 class Config(BaseSettings):
-    OpenAI_API_KEY: str
-    GROQ_API_KEY: str
-    GOOGLE_API_KEY: str
+    OpenAI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
+    GOOGLE_API_KEY: Optional[str] = None
 
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
 config = Config()

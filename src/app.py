@@ -5,12 +5,18 @@ import groq
 from google import genai
 from core.config import config
 
-def run_llm(provider,model_name,messages,max_tokens=500):
+def run_llm(provider, model_name, messages, max_tokens=500):
     if provider == "OpenAi":
-        client = OpenAI(api_key=config.OPENAI_API_KEY)
+        if not config.OpenAI_API_KEY:
+            return "Set OPENAI_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
+        client = OpenAI(api_key=config.OpenAI_API_KEY)
     elif provider == "Groq":
+        if not config.GROQ_API_KEY:
+            return "Set GROQ_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
         client = groq.Groq(api_key=config.GROQ_API_KEY)
     else:
+        if not config.GOOGLE_API_KEY:
+            return "Set GOOGLE_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
         client = genai.Client(api_key=config.GOOGLE_API_KEY)
     if provider == "Google":
         return client.models.generate_content(model=model_name, contents=[message["content"] for message in messages]).text
