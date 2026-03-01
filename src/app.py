@@ -33,3 +33,20 @@ with st.sidebar:
 
     st.session_state.provider = provider
     st.session_state.model_name = model_name
+if 'messages' not in st.session_state:
+    st.session_state.messages = [{'role': 'assistant', 'content': 'Hello! How can I help you today?'}]
+
+for message in st.session_state.messages:
+    with st.chat_message(message['role']):
+        st.markdown(message['content'])
+
+if prompt := st.chat_input("Hello! How can I help you today?"):
+    st.session_state.messages.append({'role': 'user', 'content': prompt})
+    with st.chat_message('user'):
+        st.markdown(prompt)
+    with st.chat_message('assistant'):
+        output = run_llm(st.session_state.provider, st.session_state.model_name, st.session_state.messages)
+        response_data = output
+        answer = response_data
+        st.write(answer)
+    st.session_state.messages.append({'role': 'assistant', 'content': answer})
