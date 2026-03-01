@@ -5,19 +5,34 @@ import groq
 from google import genai
 from core.config import config
 
+
+def _get_api_key(name: str) -> str | None:
+    """Use Streamlit secrets (Cloud) if set, else config (.env / env)."""
+    try:
+        v = st.secrets[name]
+        if v and isinstance(v, str):
+            return v
+    except (KeyError, TypeError, AttributeError):
+        pass
+    return {"OPENAI_API_KEY": config.OpenAI_API_KEY, "GROQ_API_KEY": config.GROQ_API_KEY, "GOOGLE_API_KEY": config.GOOGLE_API_KEY}.get(name)
+
+
 def run_llm(provider, model_name, messages, max_tokens=500):
     if provider == "OpenAi":
-        if not config.OpenAI_API_KEY:
+        key = _get_api_key("OPENAI_API_KEY")
+        if not key:
             return "Set OPENAI_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
-        client = OpenAI(api_key=config.OpenAI_API_KEY)
+        client = OpenAI(api_key=key)
     elif provider == "Groq":
-        if not config.GROQ_API_KEY:
+        key = _get_api_key("GROQ_API_KEY")
+        if not key:
             return "Set GROQ_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
-        client = groq.Groq(api_key=config.GROQ_API_KEY)
+        client = groq.Groq(api_key=key)
     else:
-        if not config.GOOGLE_API_KEY:
+        key = _get_api_key("GOOGLE_API_KEY")
+        if not key:
             return "Set GOOGLE_API_KEY in app secrets (Streamlit Cloud) or in .env locally."
-        client = genai.Client(api_key=config.GOOGLE_API_KEY)
+        client = genai.Client(api_key=key)
     if provider == "Google":
         return client.models.generate_content(model=model_name, contents=[message["content"] for message in messages]).text
     elif provider == "Groq":
